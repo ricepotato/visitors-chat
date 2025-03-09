@@ -1,19 +1,49 @@
 function init() {
   console.log("init");
   const socket = new WebSocket("ws://localhost:3000");
+
+  handleOpen(socket);
+  handleMessage(socket);
+  handleClose(socket);
+
+  addUIEventHandlers(socket);
+}
+
+// Socket Events
+
+function handleOpen(socket) {
   socket.addEventListener("open", () => {
     console.log("connected to Server ✅");
   });
+}
+
+function handleMessage(socket) {
   socket.addEventListener("message", (messageEvent) => {
-    console.log(messageEvent);
     const message = messageEvent.data;
     console.log(`message: ${message}`);
+    messageParser(message);
   });
+}
+
+function handleClose(socket) {
   socket.addEventListener("close", () => {
     console.log("disconnected from Server ❌");
   });
+}
 
-  addUIEventHandlers(socket);
+function messageParser(message) {
+  const parsedMessage = JSON.parse(message);
+  console.log(parsedMessage);
+
+  if (parsedMessage.type === "connectionCount") {
+    const connectionCount = document.getElementById("connectionCount");
+    connectionCount.textContent = parsedMessage.data;
+  }
+
+  if (parsedMessage.type === "hello") {
+    const helloMessage = document.getElementById("helloMessage");
+    console.log(helloMessage);
+  }
 }
 
 // UI
